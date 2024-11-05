@@ -12,6 +12,24 @@ import { cartResponseSchema } from "./schema";
 
 export const pushToCart: RouteHandler<AddToCartRoute> = async (ctx) => {
   const { productId, userId, quantity } = ctx.req.valid("json");
+  const ifItemExists = (
+    await db
+      .select({ productId: cart.productId, quantity: cart.quantity })
+      .from(cart)
+      .where(eq(cart.productId, productId))
+  )[0];
+
+  if(ifItemExists) {
+    await db
+      .update(cart)
+      .set({
+        quantity: ifItemExists.quantity! + quantity,
+      })
+      .where(eq(cart.productId, productId))
+      .returning();
+
+    return ctx.json({ message: "Product added to the cart" }, HttpStatusCodes.OK);
+  }
 
   await db
     .insert(cart)

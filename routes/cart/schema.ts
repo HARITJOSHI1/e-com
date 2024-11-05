@@ -2,7 +2,7 @@ import { TCart } from "@/lib/db/schema";
 import { z } from "zod";
 import { productResponseSchema } from "../products/schema";
 
-export const cartBodySchema: z.ZodSchema<TCart> = z.object({
+export const cartBodySchema = z.object({
   productId: z.string(),
   quantity: z.number(),
   userId: z.string().default(crypto.randomUUID()),
