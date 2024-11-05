@@ -4,7 +4,8 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent } from "stoker/openapi/helpers";
 import {
   cartBodySchema,
-  cartResponseSchema
+  cartResponseSchema,
+  updateCartProdQuantitySchema,
 } from "./schema";
 
 const tags = ["Cart"];
@@ -47,13 +48,32 @@ export const listAllCartItems = createRoute({
 });
 
 export const deleteItemFromCart = createRoute({
-  path: "/cart/{id}",
+  path: "/cart/product/{id}",
   method: "delete",
   tags,
 
   request: {
     params: pathParamSchema,
   },
+
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.object({ message: z.string() }),
+      "Delete product in the cart"
+    ),
+  },
+});
+
+export const updateItemFromCart = createRoute({
+  path: "/cart/product/{id}",
+  method: "patch",
+  tags,
+
+  request: {
+    params: pathParamSchema,
+    query: updateCartProdQuantitySchema,
+  },
+
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.object({ message: z.string() }),
@@ -66,3 +86,4 @@ export const deleteItemFromCart = createRoute({
 export type AddToCartRoute = typeof addToCart;
 export type ListAllCartItemsRoute = typeof listAllCartItems;
 export type DeleteItemFromCartRoute = typeof deleteItemFromCart;
+export type UpdateItemFromCartRoute = typeof updateItemFromCart;

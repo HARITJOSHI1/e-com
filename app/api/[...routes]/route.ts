@@ -2,12 +2,13 @@ import { handle } from "hono/vercel";
 import { createApp } from "@/lib/helpers/hono";
 import products from "@/routes/products";
 import cart from "@/routes/cart";
+import checkout from "@/routes/checkout";
 
 // App setup
 const app = createApp();
 
 //all routes
-const routes = [products, cart] as const;
+const routes = [products, cart, checkout] as const;
 
 routes.forEach((route) => {
   app.route("/api", route);

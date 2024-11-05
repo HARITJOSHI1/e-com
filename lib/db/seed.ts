@@ -1,7 +1,9 @@
 import db from ".";
 import { sampleProducts } from "./pgdata/products";
-// import { sampleUsers } from "./pgdata/users";
-import { products, users } from "./schema";
+import { sampleUsers } from "./pgdata/users";
+import { addresses } from "./pgdata/address";
+import { shippingAddress, billingAddress } from "./schema";
+// import { products, users } from "./schema";
 
 function isTuple<T extends any>(array: T[]): array is [T, ...T[]] {
   return array.length > 0;
@@ -10,7 +12,7 @@ function isTuple<T extends any>(array: T[]): array is [T, ...T[]] {
 const main = async () => {
   console.log("-----------Seeding started ------------");
   try {
-    const batchQ = sampleProducts.map((a) => db.insert(products).values(a));
+    const batchQ = [db.insert(billingAddress).values(addresses)];
     if (isTuple(batchQ)) {
       await db.transaction(async (trx) => {
         for (const query of batchQ) {

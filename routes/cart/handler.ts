@@ -2,11 +2,13 @@ import db from "@/lib/db";
 import { cart, products } from "@/lib/db/schema";
 import { RouteHandler, z } from "@hono/zod-openapi";
 import { desc, eq } from "drizzle-orm";
+import { getCookie, setCookie } from "hono/cookie";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import {
   AddToCartRoute,
   DeleteItemFromCartRoute,
   ListAllCartItemsRoute,
+  UpdateItemFromCartRoute,
 } from "./route";
 import { cartResponseSchema } from "./schema";
 
@@ -19,7 +21,7 @@ export const pushToCart: RouteHandler<AddToCartRoute> = async (ctx) => {
       .where(eq(cart.productId, productId))
   )[0];
 
-  if(ifItemExists) {
+  if (ifItemExists) {
     await db
       .update(cart)
       .set({
@@ -28,7 +30,10 @@ export const pushToCart: RouteHandler<AddToCartRoute> = async (ctx) => {
       .where(eq(cart.productId, productId))
       .returning();
 
-    return ctx.json({ message: "Product added to the cart" }, HttpStatusCodes.OK);
+    return ctx.json(
+      { message: "Product added to the cart" },
+      HttpStatusCodes.OK
+    );
   }
 
   await db
@@ -39,6 +44,15 @@ export const pushToCart: RouteHandler<AddToCartRoute> = async (ctx) => {
       quantity,
     })
     .returning();
+
+  if (!getCookie(ctx, "cartToken")) {
+    const cartToken = crypto.randomUUID();
+    setCookie(ctx, "cartToken", cartToken, {
+      path: "/",
+      httpOnly: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production",
+    });
+  }
 
   return ctx.json({ message: "Product added to the cart" }, HttpStatusCodes.OK);
 };
@@ -100,6 +114,26 @@ export const deleteProductsFromCart: RouteHandler<
 
   return ctx.json(
     { message: "Product deleted successfully" },
+    HttpStatusCodes.OK
+  );
+};
+
+export const updateCartItemQuantity: RouteHandler<
+  UpdateItemFromCartRoute
+> = async (ctx) => {
+  const { id } = ctx.req.valid("param");
+  const { data, up } = ctx.req.valid("query");
+
+  await db
+    .update(cart)
+    .set({
+      quantity: up ? data.quantity + 1 : data.quantity - 1,
+    })
+    .where(eq(cart.productId, id))
+    .returning();
+
+  return ctx.json(
+    { message: "Quantity updated successfully" },
     HttpStatusCodes.OK
   );
 };

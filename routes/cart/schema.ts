@@ -10,11 +10,13 @@ export const cartBodySchema = z.object({
 
 export const cartResponseSchema = z.object({
   userId: z.string(),
-  products:  productResponseSchema.pick({
-    name: true,
-    price: true,
-    img_url: true,
-  }).array()
+  products: productResponseSchema
+    .pick({
+      name: true,
+      price: true,
+      img_url: true,
+    })
+    .array(),
 });
 
 export const cartQueryParamsSchema = z.object({
@@ -38,4 +40,17 @@ export const cartQueryParamsSchema = z.object({
       in: "query",
     },
   }),
+});
+
+export const updateCartProdQuantitySchema = z.object({
+  data: cartQueryParamsSchema.pick({ quantity: true }),
+  up: z.coerce
+    .boolean()
+    .optional()
+    .openapi({
+      param: {
+        name: "up",
+        in: "query",
+      },
+    }),
 });

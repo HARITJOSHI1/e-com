@@ -10,18 +10,14 @@ import {
 import { relations, type InferSelectModel } from "drizzle-orm";
 
 // Enums
-export const orderStatusEnum = pgEnum("status", [
-  "fulfilled",
-  "shipped",
-  "awaiting_shipment",
-]);
+export const orderStatusEnum = pgEnum("status", ["fulfilled", "failed"]);
 
 // Tables
 export const users = pgTable("users", {
   id: uuid("id")
     .primaryKey()
     .$default(() => crypto.randomUUID()),
-  email: text("email"),
+  email: text("email").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -30,10 +26,10 @@ export const products = pgTable("products", {
   id: uuid("id")
     .primaryKey()
     .$default(() => crypto.randomUUID()),
-  name: text("name"),
-  price: real("price"),
-  description: text("description"),
-  img_url: text("img_url"),
+  name: text("name").notNull(),
+  price: real("price").notNull(),
+  description: text("description").notNull(),
+  img_url: text("img_url").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -42,36 +38,50 @@ export const shippingAddress = pgTable("shipping_address", {
   id: uuid("id")
     .primaryKey()
     .$default(() => crypto.randomUUID()),
-  name: text("name"),
-  street: text("street"),
-  city: text("city"),
-  postalCode: text("postal_code"),
-  country: text("country"),
-  state: text("state"),
-  phoneNumber: text("phone_number"),
+  name: text("name").notNull(),
+  street: text("street").notNull(),
+  city: text("city").notNull(),
+  postalCode: text("postal_code").notNull(),
+  country: text("country").notNull(),
+  state: text("state").notNull(),
+  phoneNumber: text("phone_number").notNull(),
 });
 
 export const billingAddress = pgTable("billing_address", {
   id: uuid("id")
     .primaryKey()
     .$default(() => crypto.randomUUID()),
-  name: text("name"),
-  street: text("street"),
-  city: text("city"),
-  postalCode: text("postal_code"),
-  country: text("country"),
-  state: text("state"),
-  phoneNumber: text("phone_number"),
+  name: text("name").notNull(),
+  street: text("street").notNull(),
+  city: text("city").notNull(),
+  postalCode: text("postal_code").notNull(),
+  country: text("country").notNull(),
+  state: text("state").notNull(),
+  phoneNumber: text("phone_number").notNull(),
+});
+
+export const transaction = pgTable("transaction", {
+  id: uuid("id")
+    .primaryKey()
+    .$default(() => crypto.randomUUID()),
+  userId: uuid("user_id").references(() => users.id, {
+    onDelete: "cascade",
+  }),
+  amount: real("amount").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const orders = pgTable("orders", {
   id: uuid("id")
     .primaryKey()
     .$default(() => crypto.randomUUID()),
-  userId: text("user_id").references(() => users.id),
-  amount: real("amount"),
+  userId: uuid("user_id").references(() => users.id, {
+    onDelete: "cascade",
+  }),
+  amount: real("amount").notNull(),
   isPaid: boolean("is_paid").default(false),
-  status: orderStatusEnum("status"),
+  status: orderStatusEnum("status").notNull(),
   shippingAddressId: uuid("shipping_address_id").references(
     () => shippingAddress.id,
     { onDelete: "cascade" }
@@ -84,6 +94,10 @@ export const orders = pgTable("orders", {
   productId: uuid("product_id").references(() => products.id, {
     onDelete: "cascade",
   }),
+
+  transactionId: uuid("transaction_id").references(() => transaction.id, {
+    onDelete: "cascade",
+  }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -92,9 +106,9 @@ export const cart = pgTable("cart", {
   id: uuid("id")
     .primaryKey()
     .$default(() => crypto.randomUUID()),
-  userId: text("user_id").references(() => users.id),
+  userId: uuid("user_id").references(() => users.id), 
   productId: uuid("product_id").references(() => products.id),
-  quantity: real("quantity"),
+  quantity: real("quantity").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -103,6 +117,7 @@ export const cart = pgTable("cart", {
 export const usersRelations = relations(users, ({ many }) => ({
   orders: many(orders),
   cart: many(cart),
+  transaction: many(transaction),
 }));
 
 export const cartRelations = relations(cart, ({ one }) => ({
@@ -119,6 +134,14 @@ export const cartRelations = relations(cart, ({ one }) => ({
 export const productsRelations = relations(products, ({ many, one }) => ({
   orders: many(orders),
   cart: one(cart),
+}));
+
+export const transactionRelations = relations(transaction, ({ one }) => ({
+  orders: one(orders),
+  users: one(users, {
+    fields: [transaction.userId],
+    references: [users.id],
+  }),
 }));
 
 export const ordersRelations = relations(orders, ({ one }) => ({
