@@ -1,6 +1,7 @@
 import db from ".";
 import { sampleProducts } from "./pgdata/products";
-import { products } from "./schema";
+// import { sampleUsers } from "./pgdata/users";
+import { products, users } from "./schema";
 
 function isTuple<T extends any>(array: T[]): array is [T, ...T[]] {
   return array.length > 0;

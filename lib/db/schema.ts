@@ -16,17 +16,20 @@ export const orderStatusEnum = pgEnum("status", [
   "awaiting_shipment",
 ]);
 
-
 // Tables
 export const users = pgTable("users", {
-  id: text("id").primaryKey().notNull(),
+  id: uuid("id")
+    .primaryKey()
+    .$default(() => crypto.randomUUID()),
   email: text("email"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const products = pgTable("products", {
-  id: uuid("id").defaultRandom().primaryKey(),
+  id: uuid("id")
+    .primaryKey()
+    .$default(() => crypto.randomUUID()),
   name: text("name"),
   price: real("price"),
   description: text("description"),
@@ -36,7 +39,9 @@ export const products = pgTable("products", {
 });
 
 export const shippingAddress = pgTable("shipping_address", {
-  id: uuid("id").defaultRandom().primaryKey(),
+  id: uuid("id")
+    .primaryKey()
+    .$default(() => crypto.randomUUID()),
   name: text("name"),
   street: text("street"),
   city: text("city"),
@@ -47,7 +52,9 @@ export const shippingAddress = pgTable("shipping_address", {
 });
 
 export const billingAddress = pgTable("billing_address", {
-  id: uuid("id").defaultRandom().primaryKey(),
+  id: uuid("id")
+    .primaryKey()
+    .$default(() => crypto.randomUUID()),
   name: text("name"),
   street: text("street"),
   city: text("city"),
@@ -58,7 +65,9 @@ export const billingAddress = pgTable("billing_address", {
 });
 
 export const orders = pgTable("orders", {
-  id: uuid("id").defaultRandom().primaryKey(),
+  id: uuid("id")
+    .primaryKey()
+    .$default(() => crypto.randomUUID()),
   userId: text("user_id").references(() => users.id),
   amount: real("amount"),
   isPaid: boolean("is_paid").default(false),
@@ -80,15 +89,15 @@ export const orders = pgTable("orders", {
 });
 
 export const cart = pgTable("cart", {
-  id: uuid("id").defaultRandom().primaryKey(),
+  id: uuid("id")
+    .primaryKey()
+    .$default(() => crypto.randomUUID()),
   userId: text("user_id").references(() => users.id),
   productId: uuid("product_id").references(() => products.id),
   quantity: real("quantity"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
-
-
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
@@ -141,10 +150,10 @@ export const BillingAddressRelations = relations(
   })
 );
 
-
 // Types
-export type TBilling = InferSelectModel<typeof billingAddress>;
-export type TOrder = InferSelectModel<typeof orders>;
-export type TShipping = InferSelectModel<typeof shippingAddress>;
-export type TUser = InferSelectModel<typeof users>;
+export type TBilling = typeof billingAddress.$inferInsert;
+export type TOrder = typeof orders.$inferInsert;
+export type TShipping = typeof shippingAddress.$inferInsert;
+export type TUser = typeof users.$inferInsert;
 export type TProduct = InferSelectModel<typeof products>;
+export type TCart = typeof cart.$inferInsert;

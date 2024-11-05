@@ -5,7 +5,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "billing_address" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" uuid PRIMARY KEY NOT NULL,
 	"name" text,
 	"street" text,
 	"city" text,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS "billing_address" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "cart" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" uuid PRIMARY KEY NOT NULL,
 	"user_id" text,
 	"product_id" uuid,
 	"quantity" real,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS "cart" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "orders" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" uuid PRIMARY KEY NOT NULL,
 	"user_id" text,
 	"amount" real,
 	"is_paid" boolean DEFAULT false,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS "orders" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "products" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" uuid PRIMARY KEY NOT NULL,
 	"name" text,
 	"price" real,
 	"description" text,
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS "products" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "shipping_address" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" uuid PRIMARY KEY NOT NULL,
 	"name" text,
 	"street" text,
 	"city" text,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS "shipping_address" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY NOT NULL,
 	"email" text,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()

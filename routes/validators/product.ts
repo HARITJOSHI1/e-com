@@ -1,5 +1,5 @@
 import { z } from "zod";
 
-export const dummyValidator = z.object({
+export const productValidator = z.object({
   rand: z.string({ message: "YOUR ERROR MESSAGES" }),
 });
