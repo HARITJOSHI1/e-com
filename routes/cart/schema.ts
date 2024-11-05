@@ -4,7 +4,7 @@ import { productResponseSchema } from "../products/schema";
 
 export const cartBodySchema: z.ZodSchema<TCart> = z.object({
   productId: z.string(),
-  quantitiy: z.number(),
+  quantity: z.number(),
   userId: z.string().default(crypto.randomUUID()),
 });
 
