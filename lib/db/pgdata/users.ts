@@ -17,6 +17,7 @@ export const sampleUsers: TUser[] = [
     updatedAt: new Date("2023-03-05T14:45:00Z"),
   },
   {
+    email: "jane.doe@example.com",
     createdAt: new Date("2023-04-10T09:20:00Z"),
     updatedAt: new Date("2023-04-10T09:20:00Z"),
   },
