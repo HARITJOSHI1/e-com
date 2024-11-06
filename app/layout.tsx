@@ -8,7 +8,8 @@ import { TanstackProvider } from "@/provider/query-client-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Title",
+  title: "Home | E-com",
+  description: "E-commerce website",
 };
 
 export default function RootLayout({

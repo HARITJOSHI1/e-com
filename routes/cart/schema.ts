@@ -8,15 +8,18 @@ export const cartBodySchema = z.object({
   userId: z.string().default(crypto.randomUUID()),
 });
 
+const augmentedProductSchema = productResponseSchema
+  .pick({
+    id: true,
+    name: true,
+    price: true,
+    img_url: true,
+  })
+  .extend({ quantity: z.number() });
+
 export const cartResponseSchema = z.object({
   userId: z.string(),
-  products: productResponseSchema
-    .pick({
-      name: true,
-      price: true,
-      img_url: true,
-    })
-    .array(),
+  products: augmentedProductSchema.array(),
 });
 
 export const cartQueryParamsSchema = z.object({

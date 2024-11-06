@@ -1,0 +1,3 @@
+export const FEATURED_PRODUCTS_COUNT = 4;
+export const PRODUCT_REVALIDATE_TIME = 15;
+export const GLOBAL_USER_ID = "f0f1698e-38ac-44c9-a590-811ebbf73965";

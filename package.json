@@ -12,10 +12,12 @@
     "db:seed": "bun run ./lib/db/seed.ts"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.2.0",
     "@hono/zod-openapi": "^0.16.4",
     "@hono/zod-validator": "^0.2.2",
     "@hookform/resolvers": "^3.9.0",
     "@neondatabase/serverless": "^0.9.4",
+    "@next/env": "^15.0.2",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-aspect-ratio": "^1.1.0",

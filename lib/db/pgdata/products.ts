@@ -1,4 +1,5 @@
 import { TProduct } from "../schema";
+import { faker } from "@faker-js/faker";
 
 export const sampleProducts: TProduct[] = [
   {
@@ -151,3 +152,9 @@ export const sampleProducts: TProduct[] = [
     updatedAt: new Date(),
   },
 ];
+
+export const getProducts = () =>
+  sampleProducts.map((prod) => ({
+    ...prod,
+    img_url: faker.image.url({ width: 1920, height: 1080 }),
+  }));

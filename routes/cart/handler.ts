@@ -1,8 +1,9 @@
 import db from "@/lib/db";
 import { cart, products } from "@/lib/db/schema";
 import { RouteHandler, z } from "@hono/zod-openapi";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { getCookie, setCookie } from "hono/cookie";
+import { revalidatePath, revalidateTag } from "next/cache";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import {
   AddToCartRoute,
@@ -54,6 +55,7 @@ export const pushToCart: RouteHandler<AddToCartRoute> = async (ctx) => {
     });
   }
 
+
   return ctx.json({ message: "Product added to the cart" }, HttpStatusCodes.OK);
 };
 
@@ -71,6 +73,7 @@ export const allcartItems: RouteHandler<ListAllCartItemsRoute> = async (
       createdAt: cart.createdAt,
       productId: cart.productId,
       userId: cart.userId,
+      quantity: cart.quantity,
     })
     .from(cart)
     .orderBy(desc(cart.createdAt))
@@ -84,12 +87,14 @@ export const allcartItems: RouteHandler<ListAllCartItemsRoute> = async (
     );
   }
 
-  const fetchRequestsForProdsInCart = allCartItems.map(async (item) =>
+  const fetchRequestsForProdsInCart = allCartItems.map(async (item, idx) =>
     db
       .select({
+        id: products.id,
         name: products.name,
         price: products.price,
         img_url: products.img_url,
+        quantity: sql<number>`cast(${allCartItems[idx].quantity} as int)`,
       })
       .from(products)
       .where(eq(products.id, item.productId!))
@@ -112,6 +117,7 @@ export const deleteProductsFromCart: RouteHandler<
 
   await db.delete(cart).where(eq(cart.productId, id)).returning();
 
+  revalidatePath("/cart", "page");
   return ctx.json(
     { message: "Product deleted successfully" },
     HttpStatusCodes.OK

@@ -4,7 +4,8 @@ import { z, TypeOf } from "zod";
 const zodEnv = z.object({
   DATABASE_URL: z.string(),
   REDIS_URL: z.string(),
-  REDIS_TOKEN: z.string()
+  REDIS_TOKEN: z.string(),
+  RANDOM_IMAGE_API_KEY: z.string(),
 });
 
 
